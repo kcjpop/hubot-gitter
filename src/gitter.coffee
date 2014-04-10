@@ -1,33 +1,44 @@
-# Hubot dependencies
-{Adapter, TextMessage} = require 'hubot'
+request      = require 'request'
+EventEmitter = require('events').EventEmitter
 
-GitterIm = require './api'
-faye     = require './faye'
+host   = process.env.HOST || 'https://api.gitter.im/v1';
+token  = process.env.TOKEN;
+roomId = process.env.ROOM_ID
 
-class Gitter extends Adapter
-    run: ->
-        self = @
-        @api = new GitterIm
-        # @api.joinRoom
-        @api.setFaye faye, @handlr.bind @
+if not token or not roomId
+    console.log 'Please provide TOKEN and ROOM_ID as env var'
+    process.exit 1
 
-        console.log self.robot.name+' now running...'
-        self.emit 'connected'
-
-    send: (envelope, strings...) ->
-        console.log 'Sending...'
-        strings.forEach (text) =>
-            @api.send text
-
-    reply: (envelope, strings...) ->
-        console.log 'Replying...'
-        @send envelope, strings
-
-    handlr: (obj) ->
-        if obj.operation == 'create'
-            msg = new TextMessage obj.model.fromUser, obj.model.text, obj.model.id
-            @receive msg
-
-exports.use = (robot) ->
-    new Gitter robot
+class GitterIm extends EventEmitter
+    constructor: ->
+        @opt =
+            headers:
+                'Accept': 'application/json'
+                'Authorization': 'Bearer '+token
     
+    cb: (err, res, body) ->
+        console.log err if err
+
+    setFaye: (faye, handler) ->
+        @faye = faye
+        @faye.subscribe '/api/v1/rooms/'+roomId+'/chatMessages', handler, {}
+
+    joinRoom: ->
+        @opt.url = host+'/rooms'
+        payload =
+            uri: roomId
+        
+        r = request.post @opt, (err, res, body) ->
+            console.log err if err
+            console.log 'Joined room '+roomId
+        r.form payload
+
+    send: (content) ->
+        @opt.url = host+'/rooms/'+roomId+'/chatMessages'
+        payload =
+            text: content
+        
+        r = request.post @opt, @cb
+        r.form payload
+
+module.exports = GitterIm
