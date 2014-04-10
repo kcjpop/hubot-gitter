@@ -7,17 +7,19 @@ faye     = require './faye'
 class Gitter extends Adapter
     run: ->
         self = @
-        @api = new GitterIm
-        # @api.joinRoom
-        @api.setFaye faye, @handlr.bind @
+        @gitter = new GitterIm
+        @gitter.joinRoom()
+
+        @gitter.on 'room:connected', () ->
+            self.gitter.setFaye faye, self.handlr.bind self
 
         console.log self.robot.name+' now running...'
-        self.emit 'connected'
+        @emit 'connected'
 
     send: (envelope, strings...) ->
         console.log 'Sending...'
         strings.forEach (text) =>
-            @api.send text
+            @gitter.send text
 
     reply: (envelope, strings...) ->
         console.log 'Replying...'

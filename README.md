@@ -3,7 +3,7 @@ A simple Hubot adapter for gitter.im
 
 ## How?
 
-* Go to `developer.gitter.im` , login and get your own token.
+* Go to `developer.gitter.im` , login and get your own token
 * Install hubot with `npm install -g hubot coffeescript`
 * Create your own bot `hubot --create mybot`
 * Go to `mybot` folder and `npm install` to install dependencies
@@ -12,5 +12,5 @@ A simple Hubot adapter for gitter.im
 
 ## Notes
 
-* Currently `ROOM_ID` must be a valid MongoDB ID, i.e, `5330777dc3599d1de448e194`
+* `ROOM_ID` could be "GitHub Org, a GitHub Repo or a Gitter Channel". See [https://developer.gitter.im/docs/rooms-resource](https://developer.gitter.im/docs/rooms-resource)
 * Default name is `Hubot`, so if you want to have another name, use `TOKEN=<your token> ROOM_ID=<the room you want to join> ./bin/hubot --name yourname -a gitter`

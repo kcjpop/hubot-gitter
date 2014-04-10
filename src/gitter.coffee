@@ -21,20 +21,32 @@ class GitterIm extends EventEmitter
 
     setFaye: (faye, handler) ->
         @faye = faye
-        @faye.subscribe '/api/v1/rooms/'+roomId+'/chatMessages', handler, {}
+        @faye.subscribe '/api/v1/rooms/'+@roomId+'/chatMessages', handler, {}
 
     joinRoom: ->
+        self = @
         @opt.url = host+'/rooms'
         payload =
             uri: roomId
         
         r = request.post @opt, (err, res, body) ->
             console.log err if err
-            console.log 'Joined room '+roomId
+
+            body = JSON.parse body
+            unless body.allowed
+                console.log 'You do not have permission to join '+roomId 
+                process.exit 1
+
+            room = body.room
+            # Save room ID for later use
+            self.roomId = room.id
+            console.log 'Welcome to room: '+room.name
+
+            self.emit 'room:connected', room
         r.form payload
 
     send: (content) ->
-        @opt.url = host+'/rooms/'+roomId+'/chatMessages'
+        @opt.url = host+'/rooms/'+@roomId+'/chatMessages'
         payload =
             text: content
         
