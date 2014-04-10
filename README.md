@@ -1,0 +1,1 @@
+A simple Hubot adapter for gitter.im
