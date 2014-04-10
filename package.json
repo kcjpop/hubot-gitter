@@ -1,7 +1,7 @@
 {
   "name": "hubot-gitter",
   "version": "0.0.1",
-  "description": "A simple Hubot adapter of Gitter.im",
+  "description": "A simple Hubot adapter of gitter.im",
   "main": "src/gitter.coffee",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,11 +10,13 @@
     "hubot",
     "gitter"
   ],
-  "author": "An Cao",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kcjpop/hubot-gitter"
+  },
+  "author": "kcjpop",
   "license": "MIT",
   "dependencies": {
-    "passport": "^0.2.0",
-    "passport-oauth2": "^1.1.2",
     "request": "^2.34.0",
     "faye": "^1.0.1"
   }
