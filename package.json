@@ -1,7 +1,7 @@
 {
   "name": "hubot-gitter",
   "version": "0.0.1",
-  "description": "A simple Hubot adapter of gitter.im",
+  "description": "A simple Hubot adapter for gitter.im",
   "main": "src/adapter.coffee",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
