@@ -22,28 +22,37 @@ class Gitter extends Adapter
     @robot.logger.debug 'Creating new Gitter client'
     @gitter = new Client @token
 
-    @robot.logger.debug 'Trying to join room '+@rooms
-    @gitter.rooms.join(@rooms)
-    .then (room) =>
-      @robot.logger.debug 'Joined room: '+room.name
-      # Listen to room event
-      events = room.listen()
-      events.on 'message', @onMessage.bind @
+    # If we have multiple rooms to join
+    @rooms.split(',').forEach (roomUri) =>
+      unless roomUri.trim() is ''
 
-      # When the adapter wants to send message to room
-      @on 'send', (envelope, strings) ->
-        strings.forEach (text) ->
-          room.send text
-    .fail (err) ->
-      @robot.logger.debug 'Cannot join room because of: '+err
-      console.log 'Cannot join room: '+err
-      process.exit 1
+        @robot.logger.debug 'Trying to join room '+roomUri
+        @gitter.rooms.join(roomUri)
+        .then (room) =>
+          @robot.logger.debug 'Joined room: '+room.name
+
+          # Listen to room event
+          events = room.listen()
+          events.on 'message', (msg) =>
+            @onMessage msg, room
+
+          # When the adapter wants to send message to room
+          @on 'send', (envelope, strings) ->
+            if envelope.room.id is room.id
+              strings.forEach (text) ->
+                room.send text
+
+        .fail (err) ->
+          @robot.logger.debug 'Cannot join room: '+err
+          console.log 'Cannot join room: '+err
 
   send: (envelope, strings...) ->
     # Emit `send` for room
     @emit 'send', envelope, strings
 
-  onMessage: (msg) ->
+  onMessage: (msg, room) ->
+    # Assign room
+    msg.fromUser.room = room
     obj = new TextMessage msg.fromUser, msg.text, msg.id
     @receive obj
 
