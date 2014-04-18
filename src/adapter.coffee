@@ -6,7 +6,7 @@ class Gitter extends Adapter
   run: ->
     @token = process.env.TOKEN
     @rooms = process.env.ROOM || process.env.ROOM_ID
-    unless @token? and @rooms?
+    unless @token? and @rooms? and @token isnt '' and @rooms isnt ''
       @robot.logger.debug 'Missing TOKEN and ROOM. Exiting...'
       err = 'You must give me your personal access TOKEN and a list of ROOM'
       console.log err
