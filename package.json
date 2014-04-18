@@ -17,7 +17,6 @@
   "author": "kcjpop",
   "license": "MIT",
   "dependencies": {
-    "request": "^2.34.0",
-    "faye": "^1.0.1"
+    "node-gitter": "^1.0.0"
   }
 }

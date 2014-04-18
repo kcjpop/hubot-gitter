@@ -1,35 +1,47 @@
 # Hubot dependencies
+Client                 = require 'node-gitter'
 {Adapter, TextMessage} = require 'hubot'
 
-GitterIm = require './gitter'
-faye     = require './faye'
-
 class Gitter extends Adapter
-    run: ->
-        self = @
-        @gitter = new GitterIm
-        @gitter.joinRoom()
+  run: ->
+    @token = process.env.TOKEN
+    @rooms = process.env.ROOM || process.env.ROOM_ID
+    unless @token? and @rooms?
+      err = 'You must give me your personal access TOKEN and a list of ROOM'
+      console.log err
+      process.exit 1
 
-        @gitter.on 'room:connected', () ->
-            self.gitter.setFaye faye, self.handlr.bind self
+    # Create new Gitter client
+    @createClient()
 
-        console.log self.robot.name+' now running...'
-        @emit 'connected'
+    # Remember to emit this event to make hubot working
+    @emit 'connected'
 
-    send: (envelope, strings...) ->
-        console.log 'Sending...'
-        strings.forEach (text) =>
-            @gitter.send text
+  createClient: ->
+    @gitter = new Client @token
 
-    reply: (envelope, strings...) ->
-        console.log 'Replying...'
-        @send envelope, strings
+    @gitter.rooms.join(@rooms)
+    .then (room) =>
+      @robot.logger.debug 'Connected to room: '+room.name
+      # Listen to room event
+      events = room.listen()
+      events.on 'message', @onMessage.bind @
 
-    handlr: (obj) ->
-        if obj.operation == 'create'
-            msg = new TextMessage obj.model.fromUser, obj.model.text, obj.model.id
-            @receive msg
+      # When the adapter wants to send message to room
+      @on 'send', (envelope, strings) ->
+          strings.forEach (text) ->
+              room.send text
+    .fail (err) ->
+      console.log 'Cannot join room: '+err
+      process.exit 1
+
+  send: (envelope, strings...) ->
+    # Emit `send` for room
+    @emit 'send', envelope, strings
+
+  onMessage: (msg) ->
+    obj = new TextMessage msg.fromUser, msg.text, msg.id
+    @receive obj
 
 exports.use = (robot) ->
-    new Gitter robot
-    
+  new Gitter robot
