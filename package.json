@@ -1,6 +1,6 @@
 {
   "name": "hubot-gitter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A simple Hubot adapter for gitter.im",
   "main": "src/adapter.coffee",
   "scripts": {
