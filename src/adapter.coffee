@@ -34,27 +34,23 @@ class Gitter extends Adapter
           # Listen to room event
           events = room.listen()
           events.on 'message', (msg) =>
-            @onMessage msg, room
+            # Attach room to TextMessage
+            msg.fromUser.room = room
+            obj = new TextMessage msg.fromUser, msg.text, msg.id
+            @receive obj
 
-          # When the adapter wants to send message to room
-          @on 'send', (envelope, strings) ->
-            if envelope.room.id is room.id
-              strings.forEach (text) ->
-                room.send text
+          # When the adapter wants to send message to this room
+          @on 'gitter:send:'+room.id, (envelope, strings) ->
+            strings.forEach (text) ->
+              room.send text
 
         .fail (err) ->
           @robot.logger.debug 'Cannot join room: '+err
           console.log 'Cannot join room: '+err
 
   send: (envelope, strings...) ->
-    # Emit `send` for room
-    @emit 'send', envelope, strings
-
-  onMessage: (msg, room) ->
-    # Assign room
-    msg.fromUser.room = room
-    obj = new TextMessage msg.fromUser, msg.text, msg.id
-    @receive obj
+    # Emit `send` to a specific room
+    @emit 'gitter:send:'+envelope.room.id, envelope, strings
 
 exports.use = (robot) ->
   new Gitter robot
