@@ -18,7 +18,7 @@ A simple Hubot adapter for gitter.im
 * Default name is `Hubot`. If you want to have another name, use `TOKEN=<your token> ROOM=<room URIs> ./bin/hubot --name yourname -a gitter`
 * If you are deploying your bot on **Heroku**
  * Follow the instruction [here](https://github.com/github/hubot/blob/master/docs/deploying/heroku.md)
- * Change startup command in `Procfile`, e.g. ``
+ * Change startup command in `Procfile`, e.g. `web: bin/hubot -a gitter -n mybot`
  * A useful service that helps to keep your bot alive is [http://unidler.herokuapp.com/](http://unidler.herokuapp.com/)
 
 ## Changelog
