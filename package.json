@@ -17,6 +17,6 @@
   "author": "kcjpop",
   "license": "MIT",
   "dependencies": {
-    "node-gitter": "1.0.0"
+    "node-gitter": "1.2.1"
   }
 }
