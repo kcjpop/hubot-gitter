@@ -32,8 +32,10 @@ class Gitter extends Adapter
           @robot.logger.debug 'Joined room: '+room.name
 
           # Listen to room event
-          events = room.listen()
-          events.on 'message', (msg) =>
+          events = room.streaming().chatMessages()
+          events.on 'chatMessages', (evt) =>
+            msg = evt.model
+
             # Attach room to TextMessage
             msg.fromUser.room = room
             obj = new TextMessage msg.fromUser, msg.text, msg.id
