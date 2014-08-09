@@ -3,7 +3,11 @@ Client                 = require 'node-gitter'
 {Adapter, TextMessage} = require 'hubot'
 
 class Gitter extends Adapter
+  # we need to save the known rooms to be able to find them by URI/name/...
+  joinedRooms: null
+
   run: ->
+    @joinedRooms = []
     @token = process.env.TOKEN
     @rooms = process.env.ROOM || process.env.ROOM_ID
     unless @token? and @rooms? and @token isnt '' and @rooms isnt ''
@@ -30,6 +34,7 @@ class Gitter extends Adapter
         @gitter.rooms.join(roomUri)
         .then (room) =>
           @robot.logger.debug 'Joined room: '+room.name
+          @joinedRooms.push room unless room in @joinedRooms
 
           # Listen to room event
           events = room.streaming().chatMessages()
@@ -52,7 +57,22 @@ class Gitter extends Adapter
 
   send: (envelope, strings...) ->
     # Emit `send` to a specific room
-    @emit 'gitter:send:'+envelope.room.id, envelope, strings
+    send = => @emit "gitter:send:#{ envelope.room.id }", envelope, strings
+    # be sure we resolve the room object if a room name is given
+    if typeof envelope.room is 'string' or envelope.room instanceof String
+      if (room = @_roomForUri envelope.room)
+        envelope.room = room
+        send()
+      else
+        @robot.logger.error "Cannot send message to unknown room #{ envelope.room }"
+    else
+      send()
+
+
+  _roomForUri: (uri) ->
+    # find a joined room object by its URI
+    for room in @joinedRooms when room.uri is uri
+      return room
 
 exports.use = (robot) ->
   new Gitter robot
