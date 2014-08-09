@@ -32,7 +32,7 @@ class Gitter extends Adapter
 
         @robot.logger.debug 'Trying to join room '+roomUri
         @gitter.rooms.join(roomUri)
-        .then (room) =>
+        .then((room) =>
           @robot.logger.debug 'Joined room: '+room.name
           @joinedRooms.push room unless room in @joinedRooms
 
@@ -45,28 +45,33 @@ class Gitter extends Adapter
             msg.fromUser.room = room
             obj = new TextMessage msg.fromUser, msg.text, msg.id
             @receive obj
+            undefined
 
           # When the adapter wants to send message to this room
           @on 'gitter:send:'+room.id, (envelope, strings) ->
             strings.forEach (text) ->
               room.send text
-
-        .fail (err) ->
+            undefined
+        )
+        .fail((err) ->
           @robot.logger.debug 'Cannot join room: '+err
           console.log 'Cannot join room: '+err
+        )
 
   send: (envelope, strings...) ->
     # Emit `send` to a specific room
-    send = => @emit "gitter:send:#{ envelope.room.id }", envelope, strings
+    send = (roomId) =>
+      @emit "gitter:send:#{ roomId }", envelope, strings
+      yes
     # be sure we resolve the room object if a room name is given
     if typeof envelope.room is 'string' or envelope.room instanceof String
       if (room = @_roomForUri envelope.room)
-        envelope.room = room
-        send()
+        send room.id
       else
         @robot.logger.error "Cannot send message to unknown room #{ envelope.room }"
+        no
     else
-      send()
+      send envelope.room.id
 
 
   _roomForUri: (uri) ->
