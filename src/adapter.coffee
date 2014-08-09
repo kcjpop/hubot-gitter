@@ -50,7 +50,7 @@ class Gitter extends Adapter
           # When the adapter wants to send message to this room
           @on 'gitter:send:'+room.id, (envelope, strings) ->
             strings.forEach (text) ->
-              room.send text
+              room.send text if text? and text isnt ''
             undefined
         )
         .fail((err) ->
