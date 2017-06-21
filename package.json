@@ -1,22 +1,15 @@
 {
   "name": "hubot-gitter",
-  "version": "0.0.3",
-  "description": "A simple Hubot adapter for gitter.im",
-  "main": "src/adapter.coffee",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "version": "1.0.0",
+  "description": "A Gitter adapter for hubot",
+  "main": "index.js",
+  "peerDependencies": {
+    "hubot": ">=2.0"
   },
-  "keywords": [
-    "hubot",
-    "gitter"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/kcjpop/hubot-gitter"
-  },
-  "author": "kcjpop",
+  "author": "An Cao <kcj.pop.com@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "node-gitter": "1.2.1"
+    "node-gitter": "^2.0.5",
+    "parent-require": "^1.0.0"
   }
 }
