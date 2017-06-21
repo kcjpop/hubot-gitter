@@ -1,37 +1,51 @@
 ## What?
+[![Gitter](https://img.shields.io/gitter/room/kcjpop/hubot-gitter.svg?style=flat-square)](https://gitter.im/kcjpop/hubot-gitter)
 A simple Hubot adapter for gitter.im
 
 ## How?
 
-* Go to `developer.gitter.im` , login and get your own **Personal Access** token (not your app token).
-* Install hubot with `npm install -g hubot coffeescript`
-* Create your own bot `hubot --create mybot`
-* Go to `mybot` folder and `npm install` to install dependencies
-* Add `hubot-gitter` as dependency by using `npm install --save hubot-gitter`
-* Start the bot `TOKEN=<your token> ROOM=<room URIs> ./bin/hubot -a gitter`
+* Go to [https://developer.gitter.im](https://developer.gitter.im), login and get your own **Personal Access Token** (NOT your app token).
+* Follow [the instruction here](https://hubot.github.com/docs/) to create your bot.
+* In your bot folder, run `npm i -S hubot-gitter`
+* Start your bot using this command,
+```bash
+TOKEN=<your Gitter Personal Access Token> ROOM="org/room1,org2/room3" ./bin/hubot -a gitter
+```
+You can let your bot join multiple rooms, each separates by comma (,)
 
-`ROOM` could be "GitHub Org, a GitHub Repo or a Gitter Channel" (see [https://developer.gitter.im/docs/rooms-resource](https://developer.gitter.im/docs/rooms-resource)) and comma-separated for multiple rooms, e.g.
-`ROOM=kcjpop,kcjpop/hubot-gitter`.
+* (Optional) Edit your `package.json` and add this to `scripts`
 
-## Notes
+```json
+{
+  "scripts": {
+    "start": "./bin/hubot --name tien -a gitter"
+  }
+}
+```
+Then you can start your bot with `npm start`. This is useful for deployment with Zeit (see below).
 
-* Default name is `Hubot`. If you want to have another name, use `TOKEN=<your token> ROOM=<room URIs> ./bin/hubot --name yourname -a gitter`
-* If you are deploying your bot on **Heroku**
- * Follow the instruction [here](https://github.com/github/hubot/blob/master/docs/deploying/heroku.md)
- * Change startup command in `Procfile`, e.g. `web: bin/hubot -a gitter -n mybot`
- * A useful service that helps to keep your bot alive is [http://unidler.herokuapp.com/](http://unidler.herokuapp.com/)
+## Deployment with Zeit
+
+You can deploy your bot for free with [Zeit](https://zeit.co/docs). Assume that you are currently in your bot folder, the deploy command is:
+
+```bash
+now -e TOKEN=<your Gitter Personal Access Token> -e ROOM="org/room1,org2/room3" 
+```
+
+Zeit will automatically run `npm start`. Please note that **Your code and logs will be made public.** so be careful there.
+
+It is possible that you would have multiple deployment with Zeit, resulting multiple instances of your bot joining the same rooms. To cure this, use `now ls` and `now rm` to delete old deployment.
 
 ## Changelog
 
+**1.0.0**
+- Upgrade after a long time
+- BREAKING: `ROOM_ID` was removed. Use `ROOM` instead.
+
 **0.0.2**
-
-Utilize module `node-gitter` to interact with Gitter API
-
-Allow bot to join multiple rooms
-
-Change `ROOM_ID` to `ROOM` for shorter param name. `ROOM_ID` is still usable.
-
+- Utilize module `node-gitter` to interact with Gitter API
+- Allow bot to join multiple rooms
+- Change `ROOM_ID` to `ROOM` for shorter param name. `ROOM_ID` is still usable.
 
 **0.0.1**
-
-Initial release
+- Initial release
